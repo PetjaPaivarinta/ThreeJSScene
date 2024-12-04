@@ -5,6 +5,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
+scene.background = new THREE.Color('#00FFFF');
+
 const loader = new GLTFLoader();
 
 let model;
@@ -28,9 +30,9 @@ const controls = new OrbitControls( camera, renderer.domElement );
 const texture = new THREE.TextureLoader().load( 'Assets/markoboy.webp' );
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
-texture.repeat.set( 8, 8 );
+texture.repeat.set( 16, 16 );
 
-const material = new THREE.MeshBasicMaterial( { map: texture } );
+const material = new THREE.MeshStandardMaterial( { map: texture } );
 const planeGeometry = new THREE.PlaneGeometry( 100, 100, 100 );
 const plane = new THREE.Mesh( planeGeometry, material );
 plane.rotation.x = -Math.PI/2;
@@ -40,25 +42,28 @@ const christmasTexture = new THREE.TextureLoader().load( 'Assets/christmastree.j
 const christmasMaterial = new THREE.MeshBasicMaterial( { map: christmasTexture } );
 const christmasGeometry = new THREE.PlaneGeometry( 40, 40, 40 );
 const christmasTree = new THREE.Mesh( christmasGeometry, christmasMaterial );
-christmasTree.position.z = -10;
+christmasTree.position.z = -40;
 christmasTree.position.y = 0;
 
-const geometry = new THREE.TorusKnotGeometry(1, 0.3, 100, 100, 2, 3); 
-const material2 = new THREE.MeshNormalMaterial( { color: 0x00ffff } );
-const cube = new THREE.Mesh( geometry, material );
+const geometry = new THREE.TorusKnotGeometry(1, 0.3, 500, 500, 2, 3); 
+const material2 = new THREE.MeshStandardMaterial({ color: 0x00ffff, metalness: 0.0, roughness: 0.4, wireframe: false, transparent: false, opacity: 1.0, side: THREE.DoubleSide, map: texture,  });
+const cube = new THREE.Mesh(geometry, material2);
 
-cube.position.x = -2;
+cube.position.x = -3;
 
-// add a spotlight from the direction of the camera
-const spotLight = new THREE.AmbientLight(0xffffff);
-spotLight.position.set(0, 0, 5);
-scene.add(spotLight);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+scene.add(ambientLight);
+
+// directiona light
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+directionalLight.position.set(0, 1, 0);
+scene.add(directionalLight);
 
 scene.add( christmasTree );
 scene.add( plane );
 scene.add( cube );
 
-camera.position.set(0, 0, 3); 
+camera.position.set(0, 2, 4); 
 controls.keys = {
 	LEFT: 'ArrowLeft', //left arrow
 	UP: 'ArrowUp', // up arrow
@@ -79,6 +84,7 @@ function animate() {
     cube.rotation.x += 0.01;
     if (model) {
         model.rotation.x += 0.01; // Rotate the model if it is loaded
+        model.rotation.z += 0.01;
     }
     renderer.render( scene, camera );
 }
